@@ -124,8 +124,13 @@ while True:
 
     if choice == '1':
         print("\n")
+        print("-------------------------------------------------------------------")
+        print("\n")
         hall.view_show_list()
         print("\n")
+        print("-------------------------------------------------------------------")
+        print("\n")
+
     if choice == '2':
         id = input("ENTER SHOW ID: ")
         if hall.check_id(id) == False:
