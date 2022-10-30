@@ -1,92 +1,117 @@
-"""--------------------------------------------------------------------------------------------------------------------------
-
-1. Make a class named Star_Cinema which will have one class attribute named hall_list which is an empty list initially.
-Make a method named entry_hall() to insert an object of class Hall (Described below) inside its hall_list. 		(5)
-
-2. Make a class named Hall which will have 5 instance attributes given below	
-
-    i.   seats which is an dictionary of seats information
-    ii.  show_list which is an list of tuples
-    iii. rows which is the row of the seats in that hall
-    iv.  cols which is the column of the seats in that hall
-    v.   hall_no which is the unique no. of that hall
-
-  Initialize an object of class Hall with rows, cols and hall_no. And insert that object to the Star_Cinema class attribute
-  named hall_list inside the initializer using inheritance. seats and show_list will be empty initially.			(20)
-
-3. Make a method in Hall class named entry_show() which will take id, movie_name and time in string format. Make a tuple with 
-all of the information and append it to the show_list attribute. Allocate seats with rows and cols using 2d list, initially all 
-seats will be free. Make a key with id to the attribute seats and value will be the 2d list. (10)
-
-4. Make a method in Hall class named book_seats() which will take the customer name, phone number, an id of the show and list of
- tuples where every tuple contains the row and col of the seat. You need to check the id of the show, and book the seats. 	(10)
-
-5. Make a method in Hall class named view_show_list() which will view all the shows running.			(5)
-
-6. Make a method in Hall class named view_available_seats() which will take an id of show, and view the seats that are available in
- that show		                                                                                        	(10)
-
-7. Make a replica system so that the counter can view all shows that are running, view available seats in a show and can book tickets in a show. (20)
-
-8. You need to handle the errors, for example-				                                        		(10)
- If someone gives a wrong id of a show
- If someone tries to book a seat that is invalid
- If someone tries to book a seat that is already booked
-
-
-9. Make the information of the classes as protected/private as you can so that the attributes can't be accessed outside the class. +(10)
-
--------------------------------------------------------------------------------------------------"""
-
 class Star_Cinema:
-    hall_list = []
+    _hall_list = []
 
     def entry_hall(self, hall):
-        self.hall_list.append(hall)
+        self._hall_list.append(hall)
 
 class Hall(Star_Cinema):
     def __init__(self, rows, cols, hall_no):
-        self.seats = {}
-        self.show_list = []
-        self.rows = rows
-        self.cols = cols
-        self.hall_no = hall_no
+        self.__seats = {}
+        self.__show_list = []
+        self.__rows = rows
+        self.__cols = cols
+        self.__hall_no = hall_no
 
-        self.entry_hall(vars(self))
+        self.entry_hall(self)
+
+    #helper methode
+    def __stage(self, row, col):
+        stage =  [[True for i in range(self.__cols)] for i in range(self.__rows)]
+        for r in range(row):
+            for c in range(col):
+                stage[r][c] = chr(65+r)+str(c)
+        return stage
+    
+    def check_id(self, id):
+        for show in self.__show_list:
+            if show[0] == id:
+                return True
+        return False
         
     def entry_show(self, id, movie_name, time):
-        self.show_list.append((id, movie_name, time))
-        self.seats[id] = [[True for i in range(self.rows)] for i in range(self.cols)]
+        self.__show_list.append((id, movie_name, time))
+        self.__seats[id] = self.__stage(self.__rows, self.__cols)
 
 
     def book_seats(self, name, phone, id, seats):
-        for s in seats:
-            if s[0] >= self.rows or s[1] >= self.cols:
-                print(f"Invaldi Seat Number ({s[0], s[1]}) - Try Again")
+        self.__name = name
+        self.__phone = phone
 
-            elif self.seats[id][s[0]][s[1]] == 'X':
-                print("This seat is already booked")
+        for s in seats:
+            if s[0] >= self.__rows or s[1] >= self.__cols:
+                print("\n")
+                print("---------------------------------------------------")
+                print("\n")
+                print(f"Invalid Seat Number {self.number_to_string(s)} - Try Again")
+                print("\n")
+                print("---------------------------------------------------")
+                print("\n")
+                return
+
+            elif self.__seats[id][s[0]][s[1]] == 'X':
+                print("\n")
+                print("-----------------------------")
+                print("\n")
+                print(f"This Seat is  already booked - {self.number_to_string(s)}")
+                print("\n")
+                print("-----------------------------")
+                print("\n")
+                return
             
             else:
-                self.seats[id][s[0]][s[1]] = 'X'
+                self.__seats[id][s[0]][s[1]] = 'X'
+        
+        #showing information of booking
+        print("\n")
+        print("###### TICKET BOOKED SUCCESSSFULLY! ######")
+        print("-----------------------------------------------")
+        print("\n")
+        print(f"Name: {self.__name}")
+        print(f"Phone Number: {self.__phone}")
+        print("\n")
+        for show in self.__show_list:
+            if(show[0] == id):
+                print(f"Movie Name: {show[1]}      Time: {show[2]}")
+        tickets = []
+        for s in seats:
+            tickets.append(chr(65+s[0])+str(s[1]))
+        print("TICKETS: ", end="")
+        for t in tickets:
+            print(t, end=" ") 
+        print("\n")
+        print(f"HALL: {self._hall_list[0].__hall_no}")
+        print("\n")
+        print("-----------------------------------------------")
+        print("\n")
 
     def view_show_list(self):
-        for show in self.show_list:
-            print(f"MOVIE NAME:{show[1]}                               SHOW ID:{show[0]}                    TIME:{show[2]}")
+        for show in self.__show_list:
+            print("MOVIE NAME: ",show[1], "                   SHOW ID: ", show[0], "              TIME: ", show[2])
 
     def view_available_seats(self, id):
-        try:
-            show = self.seats[id]
+        for show in self.__show_list:
+            if(show[0] == id):
+                print(f"Movie Name: {show[1]}      Time: {show[2]}")
+                print("X for already booked seats")
 
-            for row in range(self.rows):
-                for col in range(self.cols):
-                    print(show[row][col], end=" ")
-                print("\n")
-        except:
-            print("Id didn't match with any show!")
+        show = self.__seats[id]
+        print("\n")
+        print("--------------------------------")
+        print("\n")
+        for row in range(self.__rows):
+            for col in range(self.__cols):
+                print(show[row][col], end="     ")
+            print("\n")
+        print("--------------------------------")
+
+
+    def string_to_number(self, s):
+        return (ord(s[0])-65, int(s[1:]))
+    def number_to_string(self, n):
+        return chr(65+n[0])+str(n[1])
 
         
-hall = Hall(5, 5, 1)
+hall = Hall(3, 5, "A10")
 hall.entry_show('ae123', "Black Adam", "October 26 2022 10:00 PM")
 hall.entry_show('ae50', "Superman", "October 25 2022 8:00 PM")
 
@@ -98,37 +123,45 @@ while True:
     choice = input("ENTER OPTION: ")
 
     if choice == '1':
-        print("-------------------------------------------------------------------------------------------------------------------------")
+        print("\n")
         hall.view_show_list()
-        print("-------------------------------------------------------------------------------------------------------------------------")
+        print("\n")
     if choice == '2':
         id = input("ENTER SHOW ID: ")
-        print("True for available seat and False for booked seat")
-        print("\n")
-        hall.view_available_seats(id)
+        if hall.check_id(id) == False:
+            print("\n")
+            print("--------------------------------")
+            print("\n")
+            print(f"There is no show with id {id}")
+            print("\n")
+            print("--------------------------------")
+            print("\n")
+            
+        else:
+            print("\n")
+            hall.view_available_seats(id)
+            print("\n")
+           
     if choice == '3':
         name = input("CUSTOMER NAME: ")
         phone = input("Phone Number: ")
-        id = input("Show Id: ")
-        ticket_number = input("Enter Number of Ticket: ")
-        seats = []
-        for i in range(int(ticket_number)):
-            row = int(input("Enter Seat Row: "))
-            col = int(input("Enter Seat Col: "))
-            seats.append((row, col))
-            hall.book_seats(name, phone, id, seats)
-        
-        
-
+        id = input("ENTER SHOW ID: ")
+        if hall.check_id(id) == False:
+            print("\n")
+            print("--------------------------------")
+            print("\n")
+            print(f"There is no show with id {id}")
+            print("\n")
+            print("--------------------------------")
+            print("\n")
             
-
-
-    
-
-
-
-
-
-"""
-6. Make a method in Hall class named view_available_seats() which will take an id of show, and view the seats that are available in
- that show	"""
+        
+        else: 
+            ticket_number = input("Enter Number of Ticket: ")
+            seats = []
+            for i in range(int(ticket_number)):
+                s = input("Enter Seat Number: ")
+                seats.append(hall.string_to_number(s))
+            hall.book_seats(name, phone, id, seats)
+            
+        
