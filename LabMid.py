@@ -135,11 +135,11 @@ while True:
         id = input("ENTER SHOW ID: ")
         if hall.check_id(id) == False:
             print("\n")
-            print("--------------------------------")
+            print("---------------------------------")
             print("\n")
             print(f"There is no show with id {id}")
             print("\n")
-            print("--------------------------------")
+            print("---------------------------------")
             print("\n")
             
         else:
